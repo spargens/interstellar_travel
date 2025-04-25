@@ -19,12 +19,14 @@ const {width, height} = Dimensions.get('screen');
 
 export default function App() {
   const [currentUniverse, setCurrentUniverse] = useState('LPU');
-  const translateX = useRef(new Animated.Value(width - 120 - spacing)).current; // 60 = half of astronaut width
-  const translateY = useRef(new Animated.Value(height - 160)).current;
+  const translateX = useRef(new Animated.Value(width - 100 - spacing)).current; // 60 = half of astronaut width
+  const translateY = useRef(new Animated.Value(height - 140)).current;
+  const [travellingTo, setTravellingTo] = useState(null);
 
   const planetRefs = useRef({});
 
   const onPlanetPress = planetId => {
+    setTravellingTo(planetId);
     const ref = planetRefs.current[planetId];
     if (!ref) return;
 
@@ -42,12 +44,13 @@ export default function App() {
         toValue: offsetY,
         duration: 1000,
         useNativeDriver: true,
-      }).start();
+      }).start(() => {
+        setTravellingTo(null);
+      });
     });
   };
 
   const renderItem = ({item}) => {
-    console.log(item);
     const ref = React.createRef();
     planetRefs.current[item.id] = ref;
     return (
@@ -56,6 +59,7 @@ export default function App() {
         onPress={() => onPlanetPress(item.id)}
         animation={item.animation}
         universe={item.universe}
+        metaData={item.metaData}
       />
     );
     // return <Planet3D ref={ref} onPress={() => onPlanetPress(item.id)} />;
@@ -63,14 +67,15 @@ export default function App() {
   };
 
   const resetAstronautPosition = () => {
+    setTravellingTo(null);
     Animated.timing(translateX, {
-      toValue: width - 120 - spacing,
+      toValue: width - 100 - spacing,
       duration: 1000,
       useNativeDriver: true,
     }).start();
 
     Animated.timing(translateY, {
-      toValue: height - 160,
+      toValue: height - 140,
       duration: 1000,
       useNativeDriver: true,
     }).start();
@@ -84,7 +89,7 @@ export default function App() {
           source={require('./assets/astronaut.json')}
           autoPlay
           loop
-          style={{width: 120, height: 120}}
+          style={{width: 100, height: 100}}
         />
       </Animated.View>
       <TextInput
@@ -102,6 +107,7 @@ export default function App() {
       <CurrentUniverse
         universe={currentUniverse}
         resetAstronautPosition={resetAstronautPosition}
+        travellingTo={travellingTo}
       />
     </SafeAreaView>
   );

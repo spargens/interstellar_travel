@@ -6,7 +6,11 @@ import {planets} from '../constants/planets';
 const {width, height} = Dimensions.get('screen');
 const SPACING = 12;
 
-export default function CurrentUniverse({universe, resetAstronautPosition}) {
+export default function CurrentUniverse({
+  universe,
+  resetAstronautPosition,
+  travellingTo,
+}) {
   const [activePlanet, setActivePlanet] = useState(
     planets.filter(e => e.universe === universe)[0],
   );
@@ -31,14 +35,36 @@ export default function CurrentUniverse({universe, resetAstronautPosition}) {
           </View>
         </View>
         <Pressable
-          style={({pressed}) => [pressed && {opacity: 0.6}]}
+          style={({pressed}) => [pressed && {opacity: 0.6}, styles.row]}
           onPress={resetAstronautPosition}>
-          <LottieView
-            source={activePlanet.animation}
-            autoPlay
-            loop
-            style={{width: 120, height: 120}}
-          />
+          <View style={{width: '50%'}}>
+            <LottieView
+              source={activePlanet.animation}
+              autoPlay
+              loop
+              style={{width: 120, height: 120}}
+            />
+          </View>
+          <View style={{width: '50%'}}>
+            {travellingTo && (
+              <View>
+                <Text
+                  style={[
+                    styles.t2,
+                    {position: 'absolute', top: 2 * SPACING, fontSize: 12},
+                  ]}>
+                  Travelling to{' '}
+                  {planets.filter(p => p.id === travellingTo)[0].universe}
+                </Text>
+                <LottieView
+                  source={require('../assets/planet_loader.json')}
+                  autoPlay
+                  loop
+                  style={{width: 120, height: 120}}
+                />
+              </View>
+            )}
+          </View>
         </Pressable>
       </View>
     </View>
@@ -58,7 +84,7 @@ const styles = StyleSheet.create({
   t2: {
     fontWeight: '600',
     color: 'white',
-    fontSize: 12,
+    fontSize: 13,
   },
   row: {
     flexDirection: 'row',
